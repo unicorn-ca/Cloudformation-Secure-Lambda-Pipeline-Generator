@@ -8,8 +8,7 @@ from troposphere import (
     Or,
     Not,
     If,
-    Sub,
-    AWSProperty
+    Sub
 )
 from troposphere.codepipeline import (
     Pipeline,
@@ -22,8 +21,11 @@ from troposphere.codepipeline import (
     DisableInboundStageTransitions
 )
 from troposphere.sns import (
-Topic,
-AWSProperty as SnsAWSProperty
+    Topic
+)
+
+from troposphere.cloudformation import (
+    CustomResource
 )
 
 
@@ -162,10 +164,9 @@ resources = {
         Topic(
             "PipelineNotificationsTopic",
             Condition="IsProdStage",
-            Properties=SnsAWSProperty(
-                DisplayName=Sub("${AppName}-notifications-${AWS::Region}")
-            )
+            DisplayName=Sub("${AppName}-notifications-${AWS::Region}"),
         )
+
 }
 
 

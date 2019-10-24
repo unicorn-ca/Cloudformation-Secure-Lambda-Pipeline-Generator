@@ -165,7 +165,32 @@ resources = {
             "PipelineNotificationsTopic",
             Condition="IsProdStage",
             DisplayName=Sub("${AppName}-notifications-${AWS::Region}"),
-        )
+        ),
+    "DynamicPipelineCleanupDev":
+        CustomResource(
+            "DynamicPipelineCleanupDev",
+            Version="1.0",
+            ServiceToken=Ref("DynamicPipelineCleanupLambdaArn"),
+            RoleArn=Sub("arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${"
+                        "DevAwsAccountId}-dev"),
+            Region=Ref("AWS::Region"),
+            StackName=If("IsProdStage",
+                         Sub("${AppName}-dev"),
+                         Sub("${AppName}-dev-${Suffix}")
+                         )
+        ),
+
+    "DynamicPipelineCleanupProd":
+        CustomResource(
+            "DynamicPipelineCleanupProd",
+            Condition="IsProdStage",
+            Version="1.0",
+            ServiceToken=Ref("DynamicPipelineCleanupLambdaArn"),
+            RoleArn=Sub("arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${"
+                        "DevAwsAccountId}-dev"),
+            Region=Ref("AWS::Region"),
+            StackName=Sub("${AppName}-prod")
+        ),
 
 }
 

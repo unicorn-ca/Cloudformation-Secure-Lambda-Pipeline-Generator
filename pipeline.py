@@ -191,6 +191,29 @@ resources = {
             Region=Ref("AWS::Region"),
             StackName=Sub("${AppName}-prod")
         ),
+    "Pipeline":
+        Pipeline(
+            "Pipeline",
+            RoleArn=Ref("PipelineServiceRoleArn"),
+            Stages=[
+                Stages(
+                    Name="Source",
+                    Actions=[
+                        Actions(
+                            Name="CodeCommitSourceAction",
+                            RunOrder=1,
+                            ActionTypeId=ActionTypeId(
+                                Category="Source",
+                                Provider="CodeCommit",
+                                Owner="AWS",
+                                Version='1'
+                            )
+
+                        )
+                    ]
+                )
+            ]
+        )
 
 }
 

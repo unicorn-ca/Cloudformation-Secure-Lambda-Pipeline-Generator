@@ -163,8 +163,7 @@ Resources:
                 Provider: CloudFormation
                 Owner: AWS
                 Version: '1'
-              OutputArtifacts:
-                - Name: ChangeSetOutput
+              OutputArtifacts: []
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
@@ -178,8 +177,7 @@ Resources:
               RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
             - Name: Fuzzer
               RunOrder: 4
-              InputArtifacts:
-                  - Name: ChangeSetOutput
+              InputArtifacts: []
               ActionTypeId:
                   Category: Invoke
                   Owner: AWS
@@ -188,7 +186,11 @@ Resources:
               OutputArtifacts: []
               Configuration:
                   FunctionName: !Ref FuzzerLambda
-                  UserParameters: 'userparam'
+                  UserParameters:
+                      !If
+                        - IsProdStage
+                        - !Sub ${AppName}-dev
+                        - !Sub ${AppName}-dev-${Suffix}
         - !If
           - IsProdStage
           - Name: DeployToProd

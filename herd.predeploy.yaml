@@ -1,0 +1,15 @@
+defaults:
+    region: ap-southeast-2
+
+deployments:
+    - name: <Predeployment> staging bucket
+      stack_name: unicorn-staging-stk
+      authentication:
+          type: profile
+          profile: unicorn-pipeline-master
+      template_file: predeploy/predeploy.yaml
+      template_parameters: predeploy/params.yaml
+      tags:
+          - Key: Project
+            Value: Unicorn
+

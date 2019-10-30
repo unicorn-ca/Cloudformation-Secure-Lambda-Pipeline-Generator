@@ -58,6 +58,12 @@ Parameters:
   SecretsManagerKey:
     Description: KMS key for the use of secrets across accounts
     Type: String
+  StagingBucket:
+    Description: Bucket holding the fuzzer
+    Type: String
+  FuzzerDeployKey:
+    Description: Key into the deployment package on the StagingBucket
+    Type: String
 
 Conditions:
   IsProdStage: !Equals [ !Ref Branch, 'master' ]
@@ -157,6 +163,8 @@ Resources:
                 Provider: CloudFormation
                 Owner: AWS
                 Version: '1'
+              OutputArtifacts:
+                - Name: ChangeSetOutput
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
@@ -171,7 +179,7 @@ Resources:
             - Name: Fuzzer
               RunOrder: 4
               InputArtifacts:
-                  - Name: Source
+                  - Name: ChangeSetOutput
               ActionTypeId:
                   Category: Invoke
                   Owner: AWS
@@ -180,7 +188,7 @@ Resources:
               OutputArtifacts: []
               Configuration:
                   FunctionName: !Ref FuzzerLambda
-                  UserParameters: 'TestInput'
+                  UserParameters: 
         - !If
           - IsProdStage
           - Name: DeployToProd
@@ -308,17 +316,14 @@ Resources:
         - FuzzerLambdaExecutionPolicy
     Properties:
         # TODO: agree on the following with the fuzzer team
-        Timeout: 30    
+        Timeout: 30
         Runtime: python3.7
         MemorySize: 256
-        Handler: index.handler
+        Handler: fuzzer.fuzzer
         Role: !GetAtt FuzzerLambdaRole.Arn
         Code:
-            ZipFile: |
-                import json
-                def handler(event, context):
-                    print(json.dumps(event))
-                return {'status': 'success'}
+            S3Bucket: !Ref StagingBucket
+            S3Key: !Ref FuzzerDeployKey
 
   # ENDTODO == make this its own substack ==
 

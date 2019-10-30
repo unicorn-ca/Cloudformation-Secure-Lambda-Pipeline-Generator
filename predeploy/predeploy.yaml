@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+    Deploy a staging bucket in preparation for deploying the main pipeline
+
+Parameters:
+    StagingBucketName:
+        Description: Name of the staging bucket. Must be globally unique
+        Type: String
+        AllowedPattern: ^[A-Za-z0-9][A-Za-z0-9\-.]{1,61}[A-Za-z0-9]$
+        ConstraintDescription: Must be a valid s3 bucket name (reverse-dns compliant)
+        Default: unicorn-staging-bucket
+    DevAccountId:
+        Description: Id of the account associated with the dev account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: AWS account ID
+    PrdAccountId:
+        Description: Id of the account associated with the production account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: AWS account ID
+
+Resources:
+    StagingBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Ref StagingBucketName
+            # TODO: add encryption
+
+    StagingBucketPolicy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+            Bucket: !Ref StagingBucket
+            PolicyDocument:
+                Statement:
+                    - Action:
+                        - s3:*
+                      Effect: Allow
+                      Resource:
+                          - !GetAtt StagingBucket.Arn
+                          - !Sub    ${StagingBucket.Arn}/*
+                      Principal:
+                          AWS:
+                              - !Sub arn:aws:iam::${AWS::AccountId}:root
+                    - Action:
+                        - s3:GetObject
+                        - s3:ListBucket
+                      Effect: Allow
+                      Resource:
+                          - !Sub arn:aws:s3:::${StagingBucket}
+                          - !Sub arn:aws:s3:::${StagingBucket}/*
+                      Principal:
+                          AWS:
+                            - !Sub arn:aws:iam::${DevAccountId}:root
+                            - !Sub arn:aws:iam::${PrdAccountId}:root
+
+Outputs:
+    Bucket:
+        Value: !Ref StagingBucket

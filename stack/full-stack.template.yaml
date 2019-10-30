@@ -23,6 +23,11 @@ Metadata:
         Parameters:
           - BuildImageName
       - Label:
+          default: Fuzzer configuration
+        Parameters:
+          - StagingBucket
+          - FuzzerDeployKey
+      - Label:
           default: AWS Quick Start configuration
         Parameters:
           - QSS3BucketName
@@ -46,7 +51,11 @@ Metadata:
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
       QSS3BucketRegion:
-        default: ap-southeast-2
+        default: Region holding the quickstart bucket
+      StagingBucket:
+        default: Bucket holding deployment object
+      FuzzerDeployKey:
+        default: Key in the staging bucket to the fuzzer deployment bundle
 
 Parameters:
   DevAwsAccountId:
@@ -92,6 +101,12 @@ Parameters:
     Description: Name of role created by ChildAccountRole template in development account
     Type: String
     Default: ChildAccountRole
+  StagingBucket:
+    Description: Bucket holding deployment object
+    Type: String
+  FuzzerDeployKey:
+    Description: Key in the staging bucket to the fuzzer deployment bundle
+    Type: String
 
 Resources:
   AccountStack:
@@ -176,6 +191,8 @@ Resources:
         SecretArnDev: !GetAtt ProjectSetupStack.Outputs.SecretArnDev
         SecretArnProd: !GetAtt ProjectSetupStack.Outputs.SecretArnProd
         SecretsManagerKey: !GetAtt ProjectSetupStack.Outputs.SecretsManagerKey
+        StagingBucket: !Ref StagingBucket
+        FuzzerDeployKey: !Ref FuzzerDeployKey
       TemplateURL: !Sub https://${QSS3BucketName}.s3-${QSS3BucketRegion}.amazonaws.com/${QSS3KeyPrefix}/pipeline.template.yaml
       TimeoutInMinutes: 60
 

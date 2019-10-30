@@ -123,6 +123,10 @@ Resources:
                 Effect: Allow
                 Action:
                     - cloudformation:ListExports
+              - Resource: '*'
+                Effect: Allow
+                Action:
+                    - ssm:GetParameter
 
   PipelineServiceRoleS3Policy:
     Type: AWS::IAM::Policy

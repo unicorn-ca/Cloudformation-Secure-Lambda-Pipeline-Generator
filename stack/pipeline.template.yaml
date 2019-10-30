@@ -188,7 +188,7 @@ Resources:
               OutputArtifacts: []
               Configuration:
                   FunctionName: !Ref FuzzerLambda
-                  UserParameters: 
+                  UserParameters: 'userparam'
         - !If
           - IsProdStage
           - Name: DeployToProd
@@ -319,7 +319,7 @@ Resources:
         Timeout: 30
         Runtime: python3.7
         MemorySize: 256
-        Handler: fuzzer.fuzzer
+        Handler: basic_fuzzer.handler
         Role: !GetAtt FuzzerLambdaRole.Arn
         Code:
             S3Bucket: !Ref StagingBucket

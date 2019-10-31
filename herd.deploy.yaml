@@ -3,7 +3,7 @@ defaults:
 
 deployments:
     #    - name: Unicorn dev
-    #      stack_name: unicorn-dev
+    #      stack_name: stephen-unicorn-dev
     #      authentication:
     #          type: profile
     #          profile: unicorn-pipeline-dev
@@ -24,7 +24,7 @@ deployments:
     #          Value: '1.2'
     #
     #    - name: Unicorn prod
-    #      stack_name: unicorn-prod
+    #      stack_name: stephen-unicorn-prod
     #      authentication:
     #          type: profile
     #          profile: unicorn-pipeline-prod

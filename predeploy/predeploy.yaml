@@ -34,7 +34,7 @@ Resources:
     ErrorTopicSubscription:
         Type: AWS::SNS::Subscription
         DependsOn:
-            - ErrorTopic
+            - ErrorTopicPolicy
         Properties:
             Endpoint: !Ref  ErrorNotificationEmail
             Protocol: email
@@ -51,6 +51,7 @@ Resources:
                             AWS:
                                 - !Sub arn:aws:iam::${DevAccountId}:root
                                 - !Sub arn:aws:iam::${PrdAccountId}:root
+                                - !Sub arn:aws:iam::${AWS::AccountId}:root
                         Action:
                             - 'sns:Publish'
                             - 'sns:Subscribe'

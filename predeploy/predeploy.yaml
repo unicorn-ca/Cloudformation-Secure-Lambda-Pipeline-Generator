@@ -23,7 +23,7 @@ Parameters:
     ErrorNotificationEmail:
         Description: The Email Address That is notified when something goes wrong
         Type: String
-        AllowedPattern: [A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}
+        AllowedPattern: '[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+'
         ConstraintDescription: Email
 
 Resources:
@@ -40,38 +40,49 @@ Resources:
             Protocol: email
             TopicArn: !Ref ErrorTopic
 
-  ErrorTopicPolicy:
-    Type: AWS::SNS::TopicPolicy
-    Properties:
-      PolicyDocument:
-        Id: StephenSNSTopicPolicy
-        Version: '2012-10-17'
-        Statement:
-        - Sid: StephenSNSTopicPolicySid
-          Effect: Allow
-          Principal:
-            AWS:
-                - !Sub arn:aws:iam::${AWS::AccountId}:root
-          Action:
-            - 'sns:Publish'
-            - 'sns:Subscribe'
-            - 'sns:DeleteTopic'
-          Resource: "*"
-      Topics:
-        - !Ref SNSTestCloud
+    ErrorTopicPolicy:
+        Type: AWS::SNS::TopicPolicy
+        Properties:
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    -   Effect: Allow
+                        Principal:
+                            AWS:
+                                - !Sub arn:aws:iam::${DevAccountId}:root
+                                - !Sub arn:aws:iam::${PrdAccountId}:root
+                        Action:
+                            - 'sns:Publish'
+                            - 'sns:Subscribe'
+                            - 'sns:DeleteTopic'
+                        Resource: !Ref ErrorTopic
+
+                    -   Effect: Allow
+                        Principal:
+                            AWS:
+                                -   '*'
+                        Action:
+                            -   'sns:Publish'
+                        Resource: !Ref ErrorTopic
+                        Condition:
+                            ArnLike:
+                                aws:SourceArn:
+                                    !Join ['',[ "arn:aws:s3:::", !Ref StagingBucket  ]]
+
+
+            Topics:
+                - !Ref ErrorTopic
 
     StagingBucket:
-        Type: AWS::S3::BucketStagingBucket
-        DependsOn:
-            - ErrorTopicPolicy
+        Type: AWS::S3::Bucket
         Properties:
             BucketName: !Ref StagingBucketName
             NotificationConfiguration:
                 TopicConfigurations:
-                    - Event: 's3:ObjectCreated:*'
-                      Topic: !Ref ErrorTopic
-                    - Event: 's3:ObjectRemoved:*'
-                      Topic: !Ref ErrorTopic
+                    -   Event: 's3:ObjectCreated:*'
+                        Topic: !Ref ErrorTopic
+                    -   Event: 's3:ObjectRemoved:*'
+                        Topic: !Ref ErrorTopic
             # TODO: add encryption
 
 
@@ -81,28 +92,28 @@ Resources:
             Bucket: !Ref StagingBucket
             PolicyDocument:
                 Statement:
-                    - Action:
-                        - s3:*
-                      Effect: Allow
-                      Resource:
-                          - !GetAtt StagingBucket.Arn
-                          - !Sub    ${StagingBucket.Arn}/*
-                      Principal:
-                          AWS:
-                              - !Sub arn:aws:iam::${AWS::AccountId}:root
-                    - Action:
-                        - s3:GetObject
-                        - s3:ListBucket
-                        - s3:PutObject
-                        - s3:GetBucketLocation
-                      Effect: Allow
-                      Resource:
-                          - !Sub arn:aws:s3:::${StagingBucket}
-                          - !Sub arn:aws:s3:::${StagingBucket}/*
-                      Principal:
-                          AWS:
-                            - !Sub arn:aws:iam::${DevAccountId}:root
-                            - !Sub arn:aws:iam::${PrdAccountId}:root
+                    -   Action:
+                            - s3:*
+                        Effect: Allow
+                        Resource:
+                            - !Sub    ${StagingBucket.Arn}
+                            - !Sub    ${StagingBucket.Arn}/*
+                        Principal:
+                            AWS:
+                                - !Sub arn:aws:iam::${AWS::AccountId}:root
+                    -   Action:
+                            - s3:GetObject
+                            - s3:ListBucket
+                            - s3:PutObject
+                            - s3:GetBucketLocation
+                        Effect: Allow
+                        Resource:
+                            - !Sub arn:aws:s3:::${StagingBucket}
+                            - !Sub arn:aws:s3:::${StagingBucket}/*
+                        Principal:
+                            AWS:
+                                - !Sub arn:aws:iam::${DevAccountId}:root
+                                - !Sub arn:aws:iam::${PrdAccountId}:root
 
 Outputs:
     Bucket:

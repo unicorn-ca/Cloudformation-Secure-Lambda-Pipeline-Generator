@@ -1,5 +1,18 @@
 # Pipeline
 
+## Installation
+### Ruby
+If you haven't installed Ruby, you can do so with [rvm](https://rvm.io/)
+Install bundler:
+```
+$ gem install bundle
+```
+
+Install the ruby dependencies (cfn_nag)
+```
+$ bundle install
+```
+
 ## Deploying the pipeline
 The pipeline needs to be deployed into two steps. This will be automated using herd.
 

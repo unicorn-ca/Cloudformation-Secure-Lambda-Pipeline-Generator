@@ -1,0 +1,9 @@
+[submodule "tools/Unicorn-Wiz"]
+	path = tools/Unicorn-Wiz
+	url = https://github.com/unicorn-ca/Unicorn-Wiz
+[submodule "tools/cfn-checker"]
+	path = tools/cfn-checker
+	url = https://github.com/unicorn-ca/cfn-checker
+[submodule "tools/Herd"]
+	path = tools/Herd
+	url = https://github.com/unicorn-ca/Herd

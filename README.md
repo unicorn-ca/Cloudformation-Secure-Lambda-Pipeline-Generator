@@ -3,6 +3,7 @@
 ## Installation
 ### Ruby
 If you haven't installed Ruby, you can do so with [rvm](https://rvm.io/)
+
 Install bundler:
 ```
 $ gem install bundle
@@ -11,6 +12,11 @@ $ gem install bundle
 Install the ruby dependencies (cfn_nag)
 ```
 $ bundle install
+```
+
+## Usage
+```
+$ python cfn-checker.py -i child predeploy stack -l logs
 ```
 
 ## Deploying the pipeline

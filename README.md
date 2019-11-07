@@ -1,34 +1,21 @@
-# Pipeline
+# Unicorn Pipeline
+## Background
+**//TODO**
+
+## Requirements
+The Unicorn Pipeline requires:
+- 3x AWS accounts (Master, Dev, Prod)
+- [aws-cli](https://aws.amazon.com/cli/)
+- [Herd](https://github.com/unicorn-ca/Herd)
+- [cfn-checker](https://github.com/unicorn-ca/cfn-checker)
+
+## Configuration
+**//TODO**
 
 ## Installation
-### Ruby
-If you haven't installed Ruby, you can do so with [rvm](https://rvm.io/)
-
-Install bundler:
+Install using our launch wizard, [Unicorn-Wiz](#), then run the launch script to deploy the pipeline in your AWS accounts.
 ```
-$ gem install bundle
+$ ./unicorn-launch
 ```
-
-Install the ruby dependencies (cfn_nag)
-```
-$ bundle install
-```
-
 ## Usage
-```
-$ python cfn-checker.py -i child predeploy stack -l logs
-```
-
-## Deploying the pipeline
-The pipeline needs to be deployed into two steps. This will be automated using herd.
-
-The first step is to deploy a staging bucket into the tooling account. This will hold the templates
-and other resources for the deployment of the main toolchain.
-```sh
-$ python herd.py herd.predeploy.yaml
-```
-
-Next the pipeline can be deployed in full.
-```sh
-$ python herd.py herd.deploy.yaml
-```
+**//TODO**

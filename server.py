@@ -1,4 +1,5 @@
-import os
+import os, webbrowser
+from multiprocessing import Process
 # import herd
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
@@ -37,6 +38,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
 
 
+def start_server():
+    httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
+    httpd.serve_forever()
 
-httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
-httpd.serve_forever()
+
+p = Process(target=start_server)
+p.start()
+url = 'http://127.0.0.1:8000'
+webbrowser.open_new(url)

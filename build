@@ -7,6 +7,4 @@ git submodule update --init
 
 cd tools/Unicorn-Wiz
 
-python3 ../../server.py &
-
-python3 -mwebbrowser http://localhost:8000
+python3 ../../server.py

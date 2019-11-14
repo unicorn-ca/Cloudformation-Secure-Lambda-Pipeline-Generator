@@ -1,0 +1,12 @@
+#!/bin/sh
+
+git submodule update --init
+
+# to update submodules
+# git submodule foreach git pull origin master
+
+cd tools/Unicorn-Wiz
+
+python3 ../../server.py &
+
+python3 -mwebbrowser http://localhost:8000

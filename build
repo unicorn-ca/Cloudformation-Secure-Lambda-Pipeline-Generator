@@ -3,16 +3,16 @@
 git submodule update --init
 
 # requirements:
-# python, virtualenv
-# ruby
+#   python, virtualenv
+#   ruby
 
 # Create a virtualenv
 virtualenv unicorn-venv
 
-# activate the vent
+# activate the venv
 source unicorn-venv/bin/activate
 
-# install Herd requirements
+# install Herd requirements 
 pip install -r tools/Herd/requirements.txt
 
 # install Ruby requirements

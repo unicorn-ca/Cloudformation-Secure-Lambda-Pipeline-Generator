@@ -1,4 +1,6 @@
 import os, webbrowser
+import sys
+import time
 from multiprocessing import Process
 # import herd
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -42,8 +44,14 @@ def start_server():
     httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)
     httpd.serve_forever()
 
+if __name__ == '__main__':
+    p1 = Process(target=start_server)
+    p1.start()
 
-p = Process(target=start_server)
-p.start()
-url = 'http://127.0.0.1:8000'
-webbrowser.open_new(url)
+    try:
+        os.system("cmd.exe /C 'start http://127.0.0.1:8000'")
+        url = "http://127.0.0.1:8000"
+        webbrowser.open_new(url)
+    except:
+        print("Error no default browser found on your device. To view the wizard open a browser and go to 'http://127.0.0.1:8000' cheers")
+        

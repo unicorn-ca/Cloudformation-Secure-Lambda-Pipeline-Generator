@@ -48,10 +48,9 @@ if __name__ == '__main__':
     p1 = Process(target=start_server)
     p1.start()
 
-    try:
-        os.system("cmd.exe /C 'start http://127.0.0.1:8000'")
-        url = "http://127.0.0.1:8000"
-        webbrowser.open_new(url)
-    except:
-        print("Error no default browser found on your device. To view the wizard open a browser and go to 'http://127.0.0.1:8000' cheers")
+    os.system("cmd.exe /C 'start http://127.0.0.1:8000'")
+    url = "http://127.0.0.1:8000"
+    webbrowser.open_new(url)
+    
+    # print("Error no default browser found on your device. To view the wizard open a browser and go to 'http://127.0.0.1:8000' cheers")
         

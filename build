@@ -13,7 +13,7 @@ virtualenv unicorn-venv
 source unicorn-venv/bin/activate
 
 # install Herd requirements
-pip install -r tools/Herd/requirements.txt
+pip install --user -r tools/Herd/requirements.txt
 
 # install Ruby requirements
 cd tools/cfn-checker
@@ -36,4 +36,4 @@ cd ../../
 # else, run herd to deploy the script
 
 # destroy the virutalenv
-rm-rf unicorn-venv
+rm -rf unicorn-venv

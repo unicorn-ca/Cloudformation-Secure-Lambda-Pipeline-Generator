@@ -6,13 +6,13 @@ git submodule update --init
 # python, virtualenv
 # ruby
 
-# Create a virtualenv
+# create a virtualenv
 virtualenv unicorn-venv
 
 # activate the venv
 source unicorn-venv/bin/activate
 
-# install Her requirements
+# install Herd requirements
 pip install -r tools/Herd/requirements.txt
 
 # install Ruby requirements
@@ -21,19 +21,19 @@ gem install bundle
 bundle install
 cd ../../
 
-# tto update submodules
+# to update submodules
 # git submodule foreach git pull origin master
 cd tools/Unicorn-Wiz
 
 # server will run wizard, then it'll generate configs and exit
-python3../../server.py
+python3 ../../server.py
 cd ../../
 
-# at this point we have cfn templates in child, predeploy & stack +her.*.yaml
+# at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
 # run cfn-checker on all template files
 
-# if cfn-checker fails, abort
+# if cfn-checker fails, abourt
 # else, run herd to deploy the script
 
-# destroy the virtualenv
-rm -rf unicorn-venv
+# destroy the virutalenv
+rm-rf unicorn-venv

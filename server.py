@@ -2,8 +2,10 @@ import os, webbrowser
 import sys
 import time
 from multiprocessing import Process
-# import herd
 from http.server import HTTPServer, BaseHTTPRequestHandler
+
+# Predeploy
+# Deploy
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -31,14 +33,56 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
 
-            # do something with post_data
-            config = {}
+            post_data = json.loads(post_data)
+
+            # Edit child/prod.params.yaml
+            with open('stack/params.yaml', 'r') as file:
+                params = file.readlines()
+            
+            params[2] = f"DevAwsAccountId: {post_data['DevAwsAccountId']}"
+            params[3] = f"ProdAwsAccountId: {post_data['ProdAwsAccountId']}"
+            params[4] = f"appName: {post_data['appName']}"
+            params[6] = f"QSS3BucketName: {post_data['QSS3BucketName']}"
+            params[8] = f"QSS3BucketRegion: {post_data['QSS3BucketName']}"
+            params[11] = f"StagingBucket: {post_data['StagingBucket']}"
+
+            with open('stack/params.yaml', 'w') as file:
+                file.writelines(params)
+
+            # Edit child/prod.params.yaml
+            with open('child/dev.params.yaml', 'r') as file:
+                params = file.readlines()
+
+            params[2] = f"DevAwsAccountId: {post_data['DevAwsAccountId']}"
+            params[3] = f"ProdAwsAccountId: {post_data['ProdAwsAccountId']}"
+            
+            with open('child/dev.params.yaml', 'w') as file:
+                file.writelines(params)
+            
+            # Edit child/prod.params.yaml
+            with open('child/prod.params.yaml', 'r') as file:
+                params = file.readlines()
+
+            params[2] = f"DevAwsAccountId: {post_data['DevAwsAccountId']}"
+            params[3] = f"ProdAwsAccountId: {post_data['ProdAwsAccountId']}"
+            
+            with open('child/prod.params.yaml', 'w') as file:
+                file.writelines(params)
+
+            # Edit predeploy/params.yaml
+            with open('predeploy/params.yaml', 'r') as file:
+                params = file.readlines()
+
+            params[3] = f"DevAwsAccountId: {post_data['DevAwsAccountId']}"
+            params[4] = f"ProdAwsAccountId: {post_data['ProdAwsAccountId']}"
+            
+            with open('predeploy/params.yaml', 'w') as file:
+                file.writelines(params)
 
             # herd.run_deployments(config)
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
-
 
 def start_server():
     httpd = HTTPServer(('localhost', 8000), SimpleHTTPRequestHandler)

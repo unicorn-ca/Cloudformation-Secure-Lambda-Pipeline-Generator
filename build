@@ -7,27 +7,27 @@ git submodule update --init
 # ruby
 
 # create a virtualenv
-virtualenv unicorn-venv
+python3 -m venv unicorn-venv
 
 # activate the venv
 source unicorn-venv/bin/activate
 
 # install Herd requirements
-pip install --user -r tools/Herd/requirements.txt
+pip install -r tools/Herd/requirements.txt
 
 # install Ruby requirements
 cd tools/cfn-checker
-gem install bundle
-bundle install
-cd ../../
+gem install bundler
+bundle install --path ./
+cd ${OLDPWD}
 
 # to update submodules
 # git submodule foreach git pull origin master
 cd tools/Unicorn-Wiz
 
 # server will run wizard, then it'll generate configs and exit
-python3 ../../server.py
-cd ../../
+python3 ${OLDPWD}/server.py
+cd ${OLDPWD}
 
 # at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
 # run cfn-checker on all template files

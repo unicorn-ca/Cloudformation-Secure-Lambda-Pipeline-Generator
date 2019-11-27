@@ -3,10 +3,10 @@
 git submodule update --init
 
 # requirements:
-# python, virtualenv
+# python
 # ruby
 
-# create a virtualenv
+# create a virtual environment
 python3 -m venv unicorn-venv
 
 # activate the venv
@@ -35,5 +35,6 @@ cd ${OLDPWD}
 # if cfn-checker fails, abourt
 # else, run herd to deploy the script
 
+deactivate
 # destroy the virutalenv
-rm -rf unicorn-venv
+# rm -rf unicorn-venv

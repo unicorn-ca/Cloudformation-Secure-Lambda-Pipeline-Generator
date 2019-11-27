@@ -1,5 +1,5 @@
 format: key-value
 params:
     StagingBucketName: unicorn-staging-bucket-9301secedu
-    DevAccountId: '171350118496'
-    PrdAccountId: '220361783940'
+DevAwsAccountId: 
+ProdAwsAccountId: 

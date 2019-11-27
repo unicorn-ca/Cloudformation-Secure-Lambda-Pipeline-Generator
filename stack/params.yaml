@@ -1,13 +1,13 @@
 format: key-value
 params:
-    DevAwsAccountId: '171350118496'
-    ProdAwsAccountId: '220361783940'
-    AppName: Unicorn-API
+    DevAwsAccountId: 
+    ProdAwsAccountId: 
+    appName: 
     BuildImageName: aws/codebuild/standard:2.0
-    QSS3BucketName: unicorn-staging-bucket-9301secedu
+    QSS3BucketName: 
     QSS3KeyPrefix:  herd/test1
-    QSS3BucketRegion: ap-southeast-2
+    QSS3BucketRegion: 
     ProdChildAccountRoleName: pipeline-prod-role
     DevChildAccountRoleName: pipeline-dev-role
-    StagingBucket: unicorn-staging-bucket-9301secedu
+    StagingBucket: 
     FuzzerDeployKey: herd/test1/deployment.zip

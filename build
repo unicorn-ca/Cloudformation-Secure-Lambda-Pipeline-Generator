@@ -1,10 +1,16 @@
 #!/bin/sh
 
-git submodule update --init
+## REQUIREMENTS
+## Ruby (>= 2.3)
+## 3x AWS accounts
+## aws-cli
+## Python3, virtualenv
 
-# requirements:
-# python, virtualenv
-# ruby
+# Clone the actual repo and go into it
+git clone git@github.com:unicorn-ca/Unicorn-Pipeline.git pipeline
+cd pipeline
+
+git submodule update --init
 
 # create a virtualenv
 python3 -m venv unicorn-venv
@@ -40,3 +46,6 @@ cd ${OLDPWD}
 
 # destroy the virutalenv
 # rm -rf unicorn-venv
+
+cd ..
+rm -rf pipeline

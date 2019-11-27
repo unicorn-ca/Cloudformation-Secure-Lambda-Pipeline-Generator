@@ -22,7 +22,7 @@ bundle install --path ./
 cd ${OLDPWD}
 
 # to update submodules
-# git submodule foreach git pull origin master
+git submodule foreach git pull origin master
 cd tools/Unicorn-Wiz
 
 # server will run wizard, then it'll generate configs and exit
@@ -36,4 +36,5 @@ cd ${OLDPWD}
 # else, run herd to deploy the script
 
 # destroy the virutalenv
+deactivate
 rm -rf unicorn-venv

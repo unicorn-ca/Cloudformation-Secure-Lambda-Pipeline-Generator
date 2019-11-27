@@ -32,8 +32,8 @@ The Unicorn Pipeline requires:
 **//TODO**
 
 ## Installation
-Install pipeline with `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/build/build > tmp.sh; sh tmp.sh`.  
-Or install and run wizard by adding the `-w` flag `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/build/build > tmp.sh; sh tmp.sh -w`
+Install pipeline with `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh`.  
+Or install and run wizard by adding the `-w` flag `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh -w`
 
 ## Usage
 **//TODO**

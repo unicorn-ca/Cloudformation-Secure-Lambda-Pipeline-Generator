@@ -9,6 +9,10 @@ Parameters:
     Description: Application name, used for the repository and child stack name
     Type: String
     Default: Sample
+  RDSName:
+    Description: RDS name, used for the repository and child stack name
+    Type: String
+    Default: RDS
   BuildImageName:
     Description: Docker image for application build
     Type: String
@@ -176,6 +180,24 @@ Resources:
                     - !Sub ${AppName}-dev-${Suffix}
                 TemplatePath: BuildArtifact::sample-transformed.yaml
                 TemplateConfiguration: BuildArtifact::sample-configuration-dev.json
+              RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
+            - Name: CreateUpdate-RDS
+              RunOrder: 1
+              InputArtifacts:
+                - Name: BuildArtifact
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: '1'
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineDeploymentRole-${AWS::Region}-${DevAwsAccountId}-dev
+                StackName: !Sub ${RDSName}-dev-${Suffix}
+                TemplatePath: BuildArtifact::rds.yml
+                TemplateConfiguration: BuildArtifact::sample-configuration-rds.json
+              Region: !Sub ${AWS::Region}  
               RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
             - Name: DeployChangeSet
               RunOrder: 2

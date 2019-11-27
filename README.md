@@ -25,6 +25,8 @@
 The Unicorn Pipeline requires:
 - 3x AWS accounts (Master, Dev, Prod)
 - [aws-cli](https://aws.amazon.com/cli/)
+- Python3, virtualenv
+- Ruby (version >= 2.3)
 
 ## Configuration
 **//TODO**

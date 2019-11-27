@@ -26,7 +26,8 @@ git submodule foreach git pull origin master
 cd tools/Unicorn-Wiz
 
 # server will run wizard, then it'll generate configs and exit
-python3 ${OLDPWD}/server.py
+pwd
+python3 server.py
 cd ${OLDPWD}
 
 # at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
@@ -38,3 +39,4 @@ cd ${OLDPWD}
 # destroy the virutalenv
 deactivate
 rm -rf unicorn-venv
+# rm -rf unicorn-venv

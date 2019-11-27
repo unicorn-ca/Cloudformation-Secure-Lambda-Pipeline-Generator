@@ -26,10 +26,12 @@ cd ${OLDPWD}
 cd tools/Unicorn-Wiz
 
 # server will run wizard, then it'll generate configs and exit
-pwd
-python3 server.py
-cd ${OLDPWD}
+if [ "$1" = "-w" ];
+then	
+	python3 server.py
+fi
 
+cd ${OLDPWD}
 # at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
 # run cfn-checker on all template files
 

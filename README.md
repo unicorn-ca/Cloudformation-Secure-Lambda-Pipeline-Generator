@@ -32,9 +32,8 @@ The Unicorn Pipeline requires:
 **//TODO**
 
 ## Installation
-Install using our launch wizard, [Unicorn-Wiz](#), then run the launch script to deploy the pipeline in your AWS accounts.
-```
-$ ./unicorn-launch
-```
+Install pipeline with `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/build/build > tmp.sh; sh tmp.sh`.
+Or install and run wizard by adding the `-w` flag `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/build/build > tmp.sh; sh tmp.sh -w`
+
 ## Usage
 **//TODO**

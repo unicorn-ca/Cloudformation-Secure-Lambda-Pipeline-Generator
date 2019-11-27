@@ -2,47 +2,43 @@ defaults:
     region: ap-southeast-2
 
 deployments:
-    #    - name: Unicorn dev
-    #      stack_name: stephen-unicorn-dev
-    #      authentication:
-    #          type: profile
-    #          profile: unicorn-pipeline-dev
-    #      template_file: sync://child.template.yaml
-    #      template_parameters: child/dev.params.yaml
-    #      capabilities:
-    #        - CAPABILITY_IAM
-    #        - CAPABILITY_NAMED_IAM
-    #      sync:
-    #          bucket: unicorn-staging-bucket-9301secedu
-    #          base_key: herd/test1/
-    #          resources:
-    #            - child/child.template.yaml
-    #      tags:
-    #        - Key: Project
-    #          Value: Unicorn
-    #        - Key: Iteration
-    #          Value: '1.2'
-    #
-    #    - name: Unicorn prod
-    #      stack_name: stephen-unicorn-prod
-    #      authentication:
-    #          type: profile
-    #          profile: unicorn-pipeline-prod
-    #      template_file: sync://child.template.yaml
-    #      template_parameters: child/prod.params.yaml
-    #      capabilities:
-    #        - CAPABILITY_IAM
-    #        - CAPABILITY_NAMED_IAM
-    #      sync:
-    #          bucket: unicorn-staging-bucket-9301secedu
-    #          base_key: herd/test1/
-    #          resources:
-    #            - child/child.template.yaml
-    #      tags:
-    #        - Key: Project
-    #          Value: Unicorn
-    #        - Key: Iteration
-    #          Value: '1.2'
+    - name: Unicorn dev
+      stack_name: stephen-unicorn-dev
+      authentication:
+          type: profile
+          profile: unicorn-pipeline-dev
+      template_file: sync://child.template.yaml
+      template_parameters: child/dev.params.yaml
+      capabilities:
+        - CAPABILITY_IAM
+        - CAPABILITY_NAMED_IAM
+      sync:
+          bucket: unicorn-staging-bucket-9301secedu
+          base_key: herd/test1/
+          resources:
+            - child/child.template.yaml
+      tags:
+        - Key: Project
+          Value: Unicorn
+
+    - name: Unicorn prod
+      stack_name: stephen-unicorn-prod
+      authentication:
+          type: profile
+          profile: unicorn-pipeline-prod
+      template_file: sync://child.template.yaml
+      template_parameters: child/prod.params.yaml
+      capabilities:
+        - CAPABILITY_IAM
+        - CAPABILITY_NAMED_IAM
+      sync:
+          bucket: unicorn-staging-bucket-9301secedu
+          base_key: herd/test1/
+          resources:
+            - child/child.template.yaml
+      tags:
+        - Key: Project
+          Value: Unicorn
 
     - name: Unicorn Tooling
       stack_name: unicorn-tooling
@@ -65,9 +61,8 @@ deployments:
             - stack/pipeline.template.yaml
             - stack/project.template.yaml
             - stack/deployment.zip
+            - stack/assurance.zip
       tags:
           - Key: Project
             Value: Unicorn
-          - Key: Iteration
-            Value: '1.2'
 

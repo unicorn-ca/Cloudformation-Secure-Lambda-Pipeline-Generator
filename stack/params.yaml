@@ -3,6 +3,7 @@ params:
     DevAwsAccountId: '171350118496'
     ProdAwsAccountId: '220361783940'
     AppName: Unicorn-API
+    RDSName: Unicorn-RDS
     BuildImageName: aws/codebuild/standard:2.0
     QSS3BucketName: unicorn-staging-bucket-9301secedu
     QSS3KeyPrefix:  herd/test1

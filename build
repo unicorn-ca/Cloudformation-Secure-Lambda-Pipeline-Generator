@@ -40,9 +40,11 @@ fi
 cd ${OLDPWD}
 # at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
 # run cfn-checker on all template files
+python tool/cfn-checker/cfn-checker.py -d child predeploy stack -l logs
 
 # if cfn-checker fails, abourt
 # else, run herd to deploy the script
+python tools/Herd/herd/herd.py herd.deploy.yaml
 
 # destroy the virutalenv
 # rm -rf unicorn-venv

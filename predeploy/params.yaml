@@ -3,3 +3,4 @@ params:
     StagingBucketName: unicorn-staging-bucket-9301secedu
     DevAccountId: '171350118496'
     PrdAccountId: '220361783940'
+    ErrorNotificationEmail: chen.zhou1@unsw.edu.au

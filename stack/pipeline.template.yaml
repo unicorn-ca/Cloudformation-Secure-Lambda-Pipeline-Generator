@@ -421,7 +421,7 @@ Resources:
       Type: AWS::Lambda::Function
       DependsOn:
         - AssuranceLambdaRole
-        - AssuranceLambdaExecutionPolicy
+        - AssuranceExecutionPolicy
       Properties:
           Timeout: 300
           Runtime: python3.7

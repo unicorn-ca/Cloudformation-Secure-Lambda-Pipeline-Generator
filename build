@@ -48,6 +48,7 @@ then
 else
 	# if cfn-checker fails, abourt
 	# else, run herd to deploy the script
+	python tools/Herd/herd/herd.py herd.predeploy.yaml
 	python tools/Herd/herd/herd.py herd.deploy.yaml
 fi
 

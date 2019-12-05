@@ -1,25 +1,4 @@
 # Unicorn Pipeline
-## Background
-- Essentially, the wizard will have two stages - a config stage and a deploy stage
-- Wizard will be hosted locally - user clones the [pipeline repo](https://github.com/unicorn-ca/Unicorn-Pipeline) and runs some command to open Unicorn-Wiz in their browser
-- Wizard, Herd and cfn-checker are linked to the Pipline repo via submodules
-- By hosting the wizard locally, we don't have to tie the wizard to AWS (via an S3 or otherwise)
-- We will also be able to access aws credentials, allowing us to deploy the pipeline with the same wizard instead of a shell script which the user has to download and run
-- Assumptions:
-    - user has the `aws-cli` set up
-    - user has 3x AWS accounts (for dev, prod and master)
-
-### Config Stage
-- Wizard will configure the pipeline to the user's wishes
-- Creates cfn templates for pipeline stages: `predeploy`, `child` and `stack`
-- Creates Herd deployment files: `herd.predeploy` and `herd.deploy`
-- Files are saved on the machine in the pipeline folder they cloned
-- Creates a shell script that will deploy the pipeline
-- User can stop here and deploy manually if they want to
-
-### Deploy Stage
-- cfn-checker validates the generated cfn templates
-- Deploy the pipeline via Herd and aws-cli
 
 ## Requirements
 The Unicorn Pipeline requires:
@@ -32,8 +11,15 @@ The Unicorn Pipeline requires:
 **//TODO**
 
 ## Installation
-Install pipeline with `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh`.  
-Or install and run wizard by adding the `-w` flag `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh -w`
 
-## Usage
-**//TODO**
+Install and run wizard by adding the `-w` flag `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh -w`.
+
+You should expect the launch wizard opening on your browser. If this doesn't work for you, try doing a headless install.
+
+### Headless Install
+
+Install the pipeline with `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh`. 
+
+## Contribution
+
+Please read our [contribution guidelines](https://github.com/unicorn-ca/Unicorn-docs/blob/master/CONTRIBUTING.md) before creating an issue or pull request!

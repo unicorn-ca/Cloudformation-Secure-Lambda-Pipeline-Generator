@@ -1,4 +1,4 @@
 format: key-value
 params:
-DevAwsAccountId: 
-ProdAwsAccountId: 
+    DevAwsAccountId: ''
+    ProdAwsAccountId: ''

@@ -1,4 +1,4 @@
 format: key-value
 params:
-    CentralAwsAccountId: '833035787772'
-    ChildAccountRoleName: pipeline-prod-role
+DevAwsAccountId: 
+ProdAwsAccountId: 

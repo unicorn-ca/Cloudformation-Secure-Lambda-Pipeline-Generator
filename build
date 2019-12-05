@@ -1,12 +1,18 @@
 #!/bin/sh
 
+## REQUIREMENTS
+## Ruby (>= 2.3)
+## 3x AWS accounts
+## aws-cli
+## Python3, virtualenv
+
+# Clone the actual repo and go into it
+git clone git@github.com:unicorn-ca/Unicorn-Pipeline.git pipeline
+cd pipeline
+
 git submodule update --init
 
-# requirements:
-# python, virtualenv
-# ruby
-
-# create a virtualenv
+# create a virtual environment
 python3 -m venv unicorn-venv
 
 # activate the venv
@@ -26,17 +32,29 @@ git submodule foreach git pull origin master
 cd tools/Unicorn-Wiz
 
 # server will run wizard, then it'll generate configs and exit
-pwd
-python3 server.py
-cd ${OLDPWD}
+if [ "$1" = "-w" ];
+then	
+	python3 server.py
+fi
 
+cd ${OLDPWD}
 # at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
 # run cfn-checker on all template files
+python tools/cfn-checker/cfn-checker.py -d child predeploy stack -l logs > output.txt
+cat output.txt
+if grep -q "failed" output.txt;
+then
+    echo 'CFN-CHECKER FAILED! PLEASE CHECK THE VALUES ARE CORRECT'
+else
+	# if cfn-checker fails, abourt
+	# else, run herd to deploy the script
+	python tools/Herd/herd/herd.py herd.predeploy.yaml
+	python tools/Herd/herd/herd.py herd.deploy.yaml
+fi
 
-# if cfn-checker fails, abourt
-# else, run herd to deploy the script
-
-# destroy the virutalenv
 deactivate
-rm -rf unicorn-venv
+# destroy the virutalenv
 # rm -rf unicorn-venv
+
+cd ..
+rm -rf pipeline

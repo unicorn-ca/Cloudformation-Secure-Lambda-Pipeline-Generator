@@ -9,83 +9,22 @@ Parameters:
         AllowedPattern: ^[A-Za-z0-9][A-Za-z0-9\-.]{1,61}[A-Za-z0-9]$
         ConstraintDescription: Must be a valid s3 bucket name (reverse-dns compliant)
         Default: unicorn-staging-bucket
-    DevAccountId:
+    DevAwsAccountId:
         Description: Id of the account associated with the dev account
         Type: String
         AllowedPattern: \d{12}
         ConstraintDescription: AWS account ID
-    PrdAccountId:
+    ProdAwsAccountId:
         Description: Id of the account associated with the production account
         Type: String
         AllowedPattern: \d{12}
         ConstraintDescription: AWS account ID
 
-    ErrorNotificationEmail:
-        Description: The Email Address That is notified when something goes wrong
-        Type: String
-        AllowedPattern: '[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+'
-        ConstraintDescription: Email
-
 Resources:
-
-    ErrorTopic:
-        Type: AWS::SNS::Topic
-
-    ErrorTopicSubscription:
-        Type: AWS::SNS::Subscription
-        DependsOn:
-            - ErrorTopicPolicy
-        Properties:
-            Endpoint: !Ref  ErrorNotificationEmail
-            Protocol: email
-            TopicArn: !Ref ErrorTopic
-
-    ErrorTopicPolicy:
-        Type: AWS::SNS::TopicPolicy
-        Properties:
-            PolicyDocument:
-                Version: '2012-10-17'
-                Statement:
-                    -   Effect: Allow
-                        Principal:
-                            AWS:
-                                - !Sub arn:aws:iam::${DevAccountId}:root
-                                - !Sub arn:aws:iam::${PrdAccountId}:root
-                                - !Sub arn:aws:iam::${AWS::AccountId}:root
-                        Action:
-                            - 'sns:Publish'
-                            - 'sns:Subscribe'
-                            - 'sns:DeleteTopic'
-                        Resource: !Ref ErrorTopic
-
-                    -   Effect: Allow
-                        Principal:
-                            AWS:
-                                -   '*'
-                        Action:
-                            -   'sns:Publish'
-                        Resource: !Ref ErrorTopic
-                        Condition:
-                            ArnLike:
-                                aws:SourceArn:
-                                    !Join ['',[ "arn:aws:s3:::", !Ref StagingBucket  ]]
-
-
-            Topics:
-                - !Ref ErrorTopic
-
     StagingBucket:
         Type: AWS::S3::Bucket
         Properties:
             BucketName: !Ref StagingBucketName
-            NotificationConfiguration:
-                TopicConfigurations:
-                    -   Event: 's3:ObjectCreated:*'
-                        Topic: !Ref ErrorTopic
-                    -   Event: 's3:ObjectRemoved:*'
-                        Topic: !Ref ErrorTopic
-            # TODO: add encryption
-
 
     StagingBucketPolicy:
         Type: AWS::S3::BucketPolicy
@@ -113,12 +52,9 @@ Resources:
                             - !Sub arn:aws:s3:::${StagingBucket}/*
                         Principal:
                             AWS:
-                                - !Sub arn:aws:iam::${DevAccountId}:root
-                                - !Sub arn:aws:iam::${PrdAccountId}:root
+                                - !Sub arn:aws:iam::${DevAwsAccountId}:root
+                                - !Sub arn:aws:iam::${ProdAwsAccountId}:root
 
 Outputs:
     Bucket:
         Value: !Ref StagingBucket
-
-    ErrorTopic:
-        Value: !Ref ErrorTopic

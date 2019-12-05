@@ -12,3 +12,4 @@ params:
     DevChildAccountRoleName: pipeline-dev-role
     StagingBucket: unicorn-staging-bucket-9301
     FuzzerDeployKey: herd/test1/deployment.zip
+    CCGroupName: CodeCommit-Group

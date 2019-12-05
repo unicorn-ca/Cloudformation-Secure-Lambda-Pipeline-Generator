@@ -111,7 +111,7 @@ Parameters:
     Description: Key into the assurance lambda deployemtn package on the StagingBucket
     Type: String
   CCGroupName:
-    Decription: The name fo the group with permissions to push to Codecommit repositories
+    Description: The name fo the group with permissions to push to Codecommit repositories
     Type: String
 
 Resources:

@@ -8,17 +8,25 @@ The Unicorn Pipeline requires:
 - Ruby (version >= 2.3)
 
 ## Configuration
-**//TODO**
+**[Help Wanted!](https://github.com/unicorn-ca/Unicorn-Pipeline/issues/1)**
 
 ## Installation
 
-Install and run wizard by adding the `-w` flag `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh -w`.
+Install and run wizard by adding the `-w` flag:
+
+```shell
+curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh -w
+```
 
 You should expect the launch wizard opening on your browser. If this doesn't work for you, try doing a headless install.
 
 ### Headless Install
 
-Install the pipeline with `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh`. 
+Install the pipeline with
+
+```shell
+curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh
+``` 
 
 ## Contribution
 

@@ -1,5 +1,6 @@
 format: key-value
 params:
-    StagingBucketName: unicorn-staging-bucket-9301secedu
-    DevAccountId: '171350118496'
-    PrdAccountId: '220361783940'
+  DevAwsAccountId: '171350118496'
+  ErrorNotificationEmail: chen.zhou1@unsw.edu.au
+  ProdAwsAccountId: '220361783940'
+  StagingBucketName: unicorn-staging-bucket-9301secedu

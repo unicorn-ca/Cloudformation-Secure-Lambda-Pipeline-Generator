@@ -22,11 +22,12 @@ bundle install --path ./
 cd ${OLDPWD}
 
 # to update submodules
-# git submodule foreach git pull origin master
+git submodule foreach git pull origin master
 cd tools/Unicorn-Wiz
 
 # server will run wizard, then it'll generate configs and exit
-python3 ${OLDPWD}/server.py
+pwd
+python3 server.py
 cd ${OLDPWD}
 
 # at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
@@ -37,4 +38,5 @@ cd ${OLDPWD}
 
 deactivate
 # destroy the virutalenv
-# rm -rf unicorn-venv
+deactivate
+rm -rf unicorn-venv

@@ -9,12 +9,12 @@ Parameters:
         AllowedPattern: ^[A-Za-z0-9][A-Za-z0-9\-.]{1,61}[A-Za-z0-9]$
         ConstraintDescription: Must be a valid s3 bucket name (reverse-dns compliant)
         Default: unicorn-staging-bucket
-    DevAWSAccountId:
+    DevAwsAccountId:
         Description: Id of the account associated with the dev account
         Type: String
         AllowedPattern: \d{12}
         ConstraintDescription: AWS account ID
-    ProdAWSAccountId:
+    ProdAwsAccountId:
         Description: Id of the account associated with the production account
         Type: String
         AllowedPattern: \d{12}
@@ -48,8 +48,8 @@ Resources:
                     -   Effect: Allow
                         Principal:
                             AWS:
-                                - !Sub arn:aws:iam::${DevAWSAccountId}:root
-                                - !Sub arn:aws:iam::${ProdAWSAccountId}:root
+                                - !Sub arn:aws:iam::${DevAwsAccountId}:root
+                                - !Sub arn:aws:iam::${ProdAwsAccountId}:root
                                 - !Sub arn:aws:iam::${AWS::AccountId}:root
                         Action:
                             - 'sns:Publish'
@@ -112,8 +112,8 @@ Resources:
                             - !Sub arn:aws:s3:::${StagingBucket}/*
                         Principal:
                             AWS:
-                                - !Sub arn:aws:iam::${DevAWSAccountId}:root
-                                - !Sub arn:aws:iam::${ProdAWSAccountId}:root
+                                - !Sub arn:aws:iam::${DevAwsAccountId}:root
+                                - !Sub arn:aws:iam::${ProdAwsAccountId}:root
 
 Outputs:
     Bucket:

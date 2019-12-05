@@ -25,14 +25,15 @@
 The Unicorn Pipeline requires:
 - 3x AWS accounts (Master, Dev, Prod)
 - [aws-cli](https://aws.amazon.com/cli/)
+- Python3, virtualenv
+- Ruby (version >= 2.3)
 
 ## Configuration
 **//TODO**
 
 ## Installation
-Install using our launch wizard, [Unicorn-Wiz](#), then run the launch script to deploy the pipeline in your AWS accounts.
-```
-$ ./unicorn-launch
-```
+Install pipeline with `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh`.  
+Or install and run wizard by adding the `-w` flag `$ curl https://raw.githubusercontent.com/unicorn-ca/Unicorn-Pipeline/master/build > tmp.sh; sh tmp.sh -w`
+
 ## Usage
 **//TODO**

@@ -9,6 +9,10 @@ Parameters:
     Description: Application name, used for the repository and child stack name
     Type: String
     Default: Sample
+  RDSName:
+    Description: RDS name, used for the repository and child stack name
+    Type: String
+    Default: RDS
   BuildImageName:
     Description: Docker image for application build
     Type: String
@@ -64,6 +68,12 @@ Parameters:
   FuzzerDeployKey:
     Description: Key into the deployment package on the StagingBucket
     Type: String
+  CCGroupName:
+    Description: The name of the group with permissions to push to Codecommit repositories
+    Type: String
+  AssuranceDeployKey:
+    Description: Key into the assurance lambda deployment package on the StagingBucket
+    Type: String
 
 Conditions:
   IsProdStage: !Equals [ !Ref Branch, 'master' ]
@@ -117,6 +127,21 @@ Resources:
               Configuration:
                 RepositoryName: !Ref AppName
                 BranchName: !Ref Branch
+        - Name: Assurance
+          Actions:
+            - Name: Assurance
+              RunOrder: 1
+              InputsArtifacts:
+                - Name: Source
+              ActionTypeId:
+                  Category: Invoke
+                  Owner: AWS
+                  Version: '1'
+                  Provider: Lambda
+              OutputArtifacts: []
+              Configuration:
+                  FunctionName: !Ref AssuranceLambda
+                  UserParameters: !Sub '{"reporterType":"codecommit","branch":"${Branch}","repo":"${AppName}","group":"${CCGroupName}"}'
         - Name: Build
           Actions:
             - Name: Build
@@ -155,6 +180,24 @@ Resources:
                     - !Sub ${AppName}-dev-${Suffix}
                 TemplatePath: BuildArtifact::sample-transformed.yaml
                 TemplateConfiguration: BuildArtifact::sample-configuration-dev.json
+              RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
+            - Name: CreateUpdate-RDS
+              RunOrder: 1
+              InputArtifacts:
+                - Name: BuildArtifact
+              ActionTypeId:
+                Category: Deploy
+                Provider: CloudFormation
+                Owner: AWS
+                Version: '1'
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineDeploymentRole-${AWS::Region}-${DevAwsAccountId}-dev
+                StackName: !Sub ${RDSName}-dev-${Suffix}
+                TemplatePath: BuildArtifact::rds.yml
+                TemplateConfiguration: BuildArtifact::sample-configuration-rds.json
+              Region: !Sub ${AWS::Region}  
               RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
             - Name: DeployChangeSet
               RunOrder: 2
@@ -326,6 +369,68 @@ Resources:
         Code:
             S3Bucket: !Ref StagingBucket
             S3Key: !Ref FuzzerDeployKey
+
+  AssuranceLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+          AssumeRolePolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                - Effect: Allow
+                  Principal:
+                      Service:
+                          - lambda.amazonaws.com
+                  Action:
+                      - sts:AssumeRole
+          Path: /
+
+  AssuranceExecutionPolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+          PolicyName: AssuranceLambdaRolePolicy
+          Roles:
+            - !Ref AssuranceLambdaRole
+          PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - logs:*
+                  Resources:
+                    - arn:aws:logs:*:*:*
+                - Effect: Allow
+                  Action:
+                    - codepipeline:PutJobSuccessResult
+                    - codepipeline:PutJobFailureResult
+                  Resources:
+                    - '*'
+                - Effect: Allow
+                  Action:
+                    - iam:GetUser
+                    - iam:GetGroup
+                    - iam:GetRole
+                  Resources:
+                    - '*'
+                - Effect: Allow
+                  Action:
+                    - cloudtrail:LookupEvents
+                  Resources:
+                    - '*'
+
+  AssuranceLambda:
+      Type: AWS::Lambda::Function
+      DependsOn:
+        - AssuranceLambdaRole
+        - AssuranceLambdaExecutionPolicy
+      Properties:
+          Timeout: 300
+          Runtime: python3.7
+          MemorySize: 256
+          Handler: index.handler
+          Role: !GetAtt AssuranceLambdaRole.Arn
+          Code:
+              S3Bucket: !Ref StagingBucket
+              S3Key: !Ref AssuranceDeployKey
 
   # ENDTODO == make this its own substack ==
 

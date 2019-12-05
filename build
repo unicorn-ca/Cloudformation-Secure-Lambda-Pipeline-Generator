@@ -12,7 +12,7 @@ cd pipeline
 
 git submodule update --init
 
-# create a virtualenv
+# create a virtual environment
 python3 -m venv unicorn-venv
 
 # activate the venv
@@ -52,6 +52,7 @@ else
 	python tools/Herd/herd/herd.py herd.deploy.yaml
 fi
 
+deactivate
 # destroy the virutalenv
 # rm -rf unicorn-venv
 

@@ -235,7 +235,7 @@ Resources:
                   UserParameters:
                       !If
                         - IsProdStage
-                        - !Sub '{"stage": "prod", "account_id": "${ProdAwsAccountId}", "snooper": "${FuzzerSnooperRoleName}", "stack_name": "${AppName}-dev"}'
+                        - !Sub '{"stage": "prod", "account_id": "${DevAwsAccountId}", "snooper": "${FuzzerSnooperRoleName}", "stack_name": "${AppName}-dev"}'
                         - !Sub '{"stage": "dev", "account_id": "${DevAwsAccountId}", "snooper": "${FuzzerSnooperRoleName}", "stack_name": "${AppName}-dev-${Suffix}"}'
         - !If
           - IsProdStage

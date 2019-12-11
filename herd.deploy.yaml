@@ -3,7 +3,7 @@ defaults:
 
 deployments:
     - name: Unicorn dev
-      stack_name: stephen-unicorn-dev
+      stack_name: unicorn-dev
       authentication:
           type: profile
           profile: unicorn-pipeline-dev
@@ -14,7 +14,7 @@ deployments:
         - CAPABILITY_NAMED_IAM
       sync:
           bucket: unicorn-staging-bucket-9301secedu
-          base_key: herd/test1/
+          base_key: unicorn/deploy
           resources:
             - child/child.template.yaml
       tags:
@@ -22,7 +22,7 @@ deployments:
           Value: Unicorn
 
     - name: Unicorn prod
-      stack_name: stephen-unicorn-prod
+      stack_name: unicorn-prod
       authentication:
           type: profile
           profile: unicorn-pipeline-prod
@@ -33,7 +33,7 @@ deployments:
         - CAPABILITY_NAMED_IAM
       sync:
           bucket: unicorn-staging-bucket-9301secedu
-          base_key: herd/test1/
+          base_key: unicorn/deploy
           resources:
             - child/child.template.yaml
       tags:
@@ -52,7 +52,7 @@ deployments:
         - CAPABILITY_NAMED_IAM
       sync:
           bucket: unicorn-staging-bucket-9301secedu
-          base_key: herd/test1/
+          base_key: unicorn/deploy
           resources:
             - stack/account.template.yaml
             - stack/cross-account.template.yaml

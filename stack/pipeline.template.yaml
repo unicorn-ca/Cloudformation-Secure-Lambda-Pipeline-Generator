@@ -333,21 +333,23 @@ Resources:
                     Action:
                         - sts:AssumeRole
           Path: /
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - sts:AssumeRole
-                Resource:
-                  - !Sub arn:aws:iam::${DevAwsAccountId}:role/${FuzzerSnooperRoleName}
-                  - !Sub arn:aws:iam::${ProdAwsAccountId}:role/${FuzzerSnooperRoleName}
-              - Effect: Allow
-                Action:
-                  - cloudformation:DescribeStack
-                Resource:
-                  - !Sub "arn:aws:cloudformation:*:${DevAwsAccountId}:stack/*/*"
-                  - !Sub "arn:aws:cloudformation:*:${ProdAwsAccountId}:stack/*/*"
+          Policies:
+            - PolicyName: unicorn-xaccount-snoop-policy
+              PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                  - Effect: Allow
+                    Action:
+                      - sts:AssumeRole
+                    Resource:
+                      - !Sub arn:aws:iam::${DevAwsAccountId}:role/${FuzzerSnooperRoleName}
+                      - !Sub arn:aws:iam::${ProdAwsAccountId}:role/${FuzzerSnooperRoleName}
+                  - Effect: Allow
+                    Action:
+                      - cloudformation:DescribeStack
+                    Resource:
+                      - !Sub "arn:aws:cloudformation:*:${DevAwsAccountId}:stack/*/*"
+                      - !Sub "arn:aws:cloudformation:*:${ProdAwsAccountId}:stack/*/*"
 
   FuzzerLambdaExecutionPolicy:
     DependsOn:
@@ -414,25 +416,25 @@ Resources:
                 - Effect: Allow
                   Action:
                     - logs:*
-                  Resources:
+                  Resource:
                     - arn:aws:logs:*:*:*
                 - Effect: Allow
                   Action:
                     - codepipeline:PutJobSuccessResult
                     - codepipeline:PutJobFailureResult
-                  Resources:
+                  Resource:
                     - '*'
                 - Effect: Allow
                   Action:
                     - iam:GetUser
                     - iam:GetGroup
                     - iam:GetRole
-                  Resources:
+                  Resource:
                     - '*'
                 - Effect: Allow
                   Action:
                     - cloudtrail:LookupEvents
-                  Resources:
+                  Resource:
                     - '*'
 
   AssuranceLambda:

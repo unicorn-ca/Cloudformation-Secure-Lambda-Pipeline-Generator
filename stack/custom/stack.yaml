@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+    Unicorn Main Pipeline. Deploys the tooling nessecary to drive the unicorn pipeline. Has parameters
+    allowing user to hook into the template by utilizing AWS::Include.
+
+## Prettify Cloudformation GUI ##
+Metadata:
+    AWS::CloudFormation::Interface:
+        ParameterGroups:
+          - Label:
+                default: Application configuration
+            Parameters:
+                - AppName
+          - Label:
+                default: Cross account configuration
+            Parameters:
+                - DevAwsAccountId
+                - PrdAwsAccountId
+                - DevAssumableRole
+                - PrdAssumableRole
+          - Label:
+                default: Deployment configuration
+            Parameters:
+                - PDSBucketName
+                - PDSKeyPrefix
+                - PDSRegionName
+          - Label:
+                default: Pipeline configuration
+            Parameters:
+                - BuildImageName
+          - Label:
+                default: User Hooks
+            Parameters:
+                - UserPDStackKey
+                - UserSetupStackKey
+                - UserFinalizeStackKey
+    ParameterLabels:
+        AppName:
+            default: Application Name
+        DevAwsAccountId:
+            default: Development account ID
+        PrdAwsAccountId:
+            default: Production account ID
+        DevAssumableRole:
+            default: Development account assumable role
+        PrdAssumableRole:
+            default: Production account assumable role
+        BuildImageName:
+            default: Docker build image name
+        PDSBucketName:
+            default: PreDeployment Staging bucket name
+        PDSKeyPrefix:
+            default: PreDeployment Staging bucket template key prefix
+        PDSRegionName:
+            default: PreDeployment Staging bucket region name
+        UserPDStackKey:
+            default: PreDeployment Snippet S3 Key
+        UserSetupStackKey:
+            default: Setup Snippet S3 Key
+        UserFinalizeStackKey:
+            default: Finalize Snippet S3 Key
+## /Prettify Cloudformation GUI ##
+
+## Parameters ##
+# Split into Unicorn Parameters + User Hook Parameters #
+Parameters:
+    ## Unicorn Parameters ##
+    # Parameters to setup Unicorn #
+    DevAwsAccountId:
+        Description: AWS account ID for development account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: Must be a valid AWS account ID
+    ProdAwsAccountId:
+        Description: AWS Account ID for production account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: Must be a valid AWS account ID
+    DevAssumableRole:
+        Description: A role in dev that can be assumed to deploy cloudformation templates
+        Type: String
+        # TODO: Constraint
+    PrdAssumableRole:
+        Description: A role in prod that can assumed to deploy cloudformation templates
+        Type: String
+    AppName:
+        Description: Name of the application to run through the pipeline
+        Type: String
+    BuildImageName:
+        Description: Docker image specifying build environment for the application
+        Type: String
+        Default: aws/codebuild/standard:2.0
+    PDSBucketName:
+        Description: Name of the bucket containing the deployment files - typically the PreDeployment Staging bucket.
+        Type: String
+        AllowedPattern: ^[a-zA-Z-]$
+        ConstraintDescription: Must be a valid S3 bucket name - replace . with -
+    PDSKeyPrefix:
+        Description: The key prefix underwhich tooling template files are contained.
+        Type: String
+        Default: templates/unicorn/tooling
+        # TODO: Constraint
+    PDSRegionName:
+        Description: Name of the region in which the PDSBucket resides.
+        Type: String
+        Default: ap-southeast-2
+    ## /Unicorn Parameters ##
+    ## User Hook Parameters ##
+    # Parameters to enable users to deploy their own templates, blank if no template #
+    UserPDStackKey:
+        Description: A optional key specifying the location of a user template containing pre-deployment setup snippet (AWS::Include).
+        Type: String
+        # TODO: Constraint
+    UserSetupStackKey:
+        Description: A optional key specifying the location of a user template containing a setup (post shared resources, pre pipeline) snippet (AWS::Include).
+        Type: String
+        # TODO: Constraint
+    UserFinalizeStackKey:
+        Description: A optional key specifying the location of a user template containing a finalize (post pipeline) snippet (AWS::Include).
+        Type: String
+        # TODO: Constraint
+    ## /User Hook Parameters ##
+## /Parameters ##
+
+## Conditions ##
+# Checks if the user hook should be deployed #
+Conditions:
+    UserDefinedPDStack: !Not [!Equals [!Ref UserPDStackKey, ""]]
+    UserDefinedSetupStack: !Not [!Equals [!Ref UserSetupStackKey, ""]]
+    UserDefinedFinalizeStack: !Not [!Equals [!Ref UserFinalizeStackKey, ""]]
+## /Conditions ##
+
+## Resources ##
+# Resources prefixed with User, are user hooks #
+Resources:
+    Fn::Transform:
+        Name: AWS::Include
+        Condition: UserDefinedPDStack
+        Properties:
+            Location: !Sub https://${PDSBucketName}.s3-${PDSRegionName}.amazonaws.com/${UserPDStackKey}
+
+    SharedResourceStack:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            Parameters:
+                DevAwsAccountId: !Ref DevAwsAccountId
+                ProdAwsAccountId: !Ref ProdAwsAccountId
+            TemplateURL: !Sub https://${PDSBucketName}.s3-${PDSRegionName}/${PDSKeyPrefix}/shared_resources.template.yaml
+
+    Fn::Transform:
+        Name: AWS::Include
+        Condition: UserDefinedSetupStack
+        Properties:
+            Location: !Sub https://${PDSBucketName}.s3-${PDSRegionName}.amazonaws.com/${UserSetupStackKey}
+
+    PipelineStack:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            Parameters:
+                DevAwsAccountId: !Ref DevAwsAccountId
+                ProdAwsAccountId: !Ref ProdAwsAccountId
+            TemplateURL: !Sub https://${PDSBucketName}.s3-${PDSRegionName}/${PDSKeyPrefix}/pipeline.template.yaml
+
+    Fn::Transform:
+        Name: AWS::Include
+        Condition: UserDefinedFinalizeStack
+        Parameters:
+            Location: !Sub https://${PDSBucketName}.s3-${PDSRegionName}.amazonaws.com/${UserFinalizeStackKey}
+
+## /Resources ##

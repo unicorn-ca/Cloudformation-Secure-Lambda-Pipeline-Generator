@@ -134,7 +134,7 @@ Resources:
           Actions:
             - Name: Assurance
               RunOrder: 1
-              InputsArtifacts:
+              InputArtifacts:
                 - Name: Source
               ActionTypeId:
                   Category: Invoke
@@ -235,8 +235,8 @@ Resources:
                   UserParameters:
                       !If
                         - IsProdStage
-                        - !Sub ${AppName}-dev
-                        - !Sub ${AppName}-dev-${Suffix}
+                        - !Sub '{"stage": "prod", "account_id": "${ProdAwsAccountId}", "snooper": "${FuzzerSnooperRoleName}", "stack_name": "${appName}-dev"}'
+                        - !Sub '{"stage": "dev", "account_id": "${DevAwsAccountId}", "snooper": "${FuzzerSnooperRoleName}", "stack_name": "${AppName}-dev-${suffix}"}'
         - !If
           - IsProdStage
           - Name: DeployToProd
@@ -350,6 +350,12 @@ Resources:
                     Resource:
                       - !Sub "arn:aws:cloudformation:*:${DevAwsAccountId}:stack/*/*"
                       - !Sub "arn:aws:cloudformation:*:${ProdAwsAccountId}:stack/*/*"
+
+                  - Effect: Allow
+                    Action:
+                      - apigateway:GET
+                    Resource:
+                      - arn:aws:apigateway:*::*  # Intentional
 
   FuzzerLambdaExecutionPolicy:
     DependsOn:

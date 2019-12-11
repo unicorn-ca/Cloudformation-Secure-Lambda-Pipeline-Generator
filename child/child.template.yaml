@@ -95,6 +95,11 @@ Resources:
               - cloudformation:Detect*
             # This is intentional - theres no way of nicely getting the stack before it exists
             Resource: '*'
+          - Effect: Allow
+            Action:
+              - apigateway:GET
+            Resource:
+              - 'arn:aws:apigateway:*::*'
 
 Outputs:
   RemoteAccountRole:

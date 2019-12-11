@@ -4,12 +4,12 @@ params:
     ProdAwsAccountId: '220361783940'
     AppName: Unicorn-API
     BuildImageName: aws/codebuild/standard:2.0
-    QSS3BucketName: unicorn-staging-bucket-9301secedu 
+    QSS3BucketName: unicorn-staging-bucket-9301secedu
     QSS3KeyPrefix: unicorn/deploy 
     QSS3BucketRegion: ap-southeast-2
     ProdChildAccountRoleName: pipeline-prod-role
     DevChildAccountRoleName: pipeline-dev-role
-    StagingBucket: unicorn-staging-bucket-9301
+    StagingBucket: unicorn-staging-bucket-9301secedu
     FuzzerDeployKey: unicorn/deploy/deployment.zip
     CCGroupName: CodeCommit-Group
     AssuranceDeployKey: unicorn/deploy/assurance.zip

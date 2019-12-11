@@ -34,7 +34,7 @@ if [ "$?" != 0 ]; then log_fatal "Failed to create virtual environment"; fi
 source installation-venv/bin/activate
 
 pip install -r tools/Herd/requirements.txt
-pip install tools/Herd
+pip install -e tools/Herd
 
 # 4. Install ruby requirements
 log "4. Installing ruby dependancies"

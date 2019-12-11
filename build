@@ -1,60 +1,75 @@
 #!/bin/sh
 
-## REQUIREMENTS
-## Ruby (>= 2.3)
-## 3x AWS accounts
-## aws-cli
-## Python3, virtualenv
+# env
+UNICORN_CA_ORG_URL="https://github.com/unicorn-ca"
 
-# Clone the actual repo and go into it
-git clone git@github.com:unicorn-ca/Unicorn-Pipeline.git pipeline
+# helpers
+function log { echo $1; }
+function log_fatal { log "[FATAL] $1"; }
+
+# Setup
+BUILD_DIR=unicorn-build-`date +%s`
+mkdir $BUILD_DIR
+cd $BUILD_DIR
+
+# 1. Clone the repo
+log "1. Cloning pipeline from $UNICORN_CA_ORG_URL/Unicorn-Pipeline.git"
+
+git clone --quiet $UNICORN_CA_ORG_URL/Unicorn-Pipeline.git pipeline
+if [ "$?" != 0 ]; then log_fatal "Failed to clone pipeline"; fi
+
+# 2. Install submodules
+log "2. Installing submodules"
 cd pipeline
 
-git submodule update --init
+git submodule --quiet update --init
+git submodule foreach git pull origin master
+if [ "$?" != 0 ]; then log_fatal "Failed to install submodules"; fi
 
-# create a virtual environment
-python3 -m venv unicorn-venv
+# 3. Creating virtual environment
+log "3. Creating python venv and installing dependancies"
+python3 -m venv installation-venv
+if [ "$?" != 0 ]; then log_fatal "Failed to create virtual environment"; fi
 
-# activate the venv
-source unicorn-venv/bin/activate
+source installation-venv/bin/activate
 
-# install Herd requirements
 pip install -r tools/Herd/requirements.txt
+pip install tools/Herd
 
-# install Ruby requirements
+# 4. Install ruby requirements
+log "4. Installing ruby dependancies"
 cd tools/cfn-checker
 gem install bundler
 bundle install --path ./
 cd ${OLDPWD}
 
-# to update submodules
-git submodule foreach git pull origin master
+# 5. Wizard
+log "5. Launching Wizard"
 cd tools/Unicorn-Wiz
 
-# server will run wizard, then it'll generate configs and exit
-if [ "$1" = "-w" ];
-then	
-	python3 server.py
-fi
+if [ "$1" = "-w" ]; then python3 server.py ../../; fi
 
-cd ${OLDPWD}
+cd  ${OLDPWD}
+
 # at this point we have cfn templates in child, predeploy & stack + herd.*.yaml
 # run cfn-checker on all template files
-python tools/cfn-checker/cfn-checker.py -d child predeploy stack -l logs > output.txt
-cat output.txt
-if grep -q "failed" output.txt;
-then
-    echo 'CFN-CHECKER FAILED! PLEASE CHECK THE VALUES ARE CORRECT'
-else
-	# if cfn-checker fails, abourt
-	# else, run herd to deploy the script
-	python tools/Herd/herd/herd.py herd.predeploy.yaml
-	python tools/Herd/herd/herd.py herd.deploy.yaml
-fi
-
+# python tools/cfn-checker/cfn-checker.py -d child predeploy stack -l logs > output.txt
+# cat output.txt
+# if grep -q "failed" output.txt;
+# then
+#     echo 'CFN-CHECKER FAILED! PLEASE CHECK THE VALUES ARE CORRECT'
+# else
+# 	# if cfn-checker fails, abourt
+# 	# else, run herd to deploy the script
+# 	python tools/Herd/herd/herd.py herd.predeploy.yaml
+# 	python tools/Herd/herd/herd.py herd.deploy.yaml
+# fi
+# 
 deactivate
+cd ../..
+rm -rf $BUILD_DIR
 # destroy the virutalenv
 # rm -rf unicorn-venv
 
-cd ..
-rm -rf pipeline
+# cd ..
+# rm -rf pipeline

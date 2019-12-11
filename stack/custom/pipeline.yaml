@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+    Deploys the pipeline itself
+
+Parameters:
+    DevAwsAccountId:
+        Description: AWS account ID for development account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: Must be a valid AWS account ID
+    ProdAwsAccountId:
+        Description: AWS Account ID for production account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: Must be a valid AWS account ID
+
+Resources:
+    Repository:
+        Type: AWS::CodeCommit::Repository
+        Properties:
+            RepositoryName: !Ref AppName
+            Triggers:
+             - CustomData: !Sub '{"AppName": "${AppName}"}'
+               DestinationArn: !Ref 

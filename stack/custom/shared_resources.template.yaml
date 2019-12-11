@@ -1,0 +1,138 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+    Deploys the shared resources that the pipeline depends on. i.e. artifact bucket
+
+Parameters:
+    AppName:
+        Description: Name of the application to run through the pipeline
+        Type: String
+    DevAwsAccountId:
+        Description: AWS account ID for the development account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: Must be a valid AWS Account ID
+    ProdAwsAccountId:
+        Description: AWS account ID for the production account
+        Type: String
+        AllowedPattern: \d{12}
+        ConstraintDescription: Must be a valid AWS Account ID
+
+Resources:
+    ## TODO: Extract this into an include ##
+    ArtifactBucket:
+        Type: AWS::S3::Bucket
+        DependsOn: ArtifactBucketKey
+        Properties:
+            # TODO: user specifiable
+            BucketName: !Sub Unicorn-${AppName}-ArtifactBucket
+            BucketEncryption:
+                ServerSideEncryptionConfiguration:
+                  - ServerSideEncryptionByDefault:
+                        KMSMasterKeyId: !Sub ${ArtifactBucketKey.Arn}
+                        SSEAlgorithm: aws:kms
+    ArtifactBucketKey:
+        Type: AWS::KMS::Key
+        Properties:
+            Description: Key for encrypting the artifact bucket
+            EnableKeyRotation: true
+            KeyPolicy:
+                Version: 2012-10-17
+                Id: !Ref AWS::StackName
+                Statement:
+                  - Sid: CodepipelineABKey
+                    Effect: Allow
+                    Principal:
+                        AWS: !GetAtt PipelineServiceRole.Arn
+                    Action:
+                      - kms:Encrypt
+                      - kms:Decrypt
+                      - kms:ReEncryptTo
+                      - kms:ReEncryptFrom
+                      - kms:GenerateDataKey
+                      - kms:DescribeKey
+                    Resource: '*'
+
+    ArtifactBucketPolicy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+            Bucket: !Ref ArtifactBucket
+            PolicyDocument:
+                Statement:
+                  - Action: s3:*    # Probably just need put and get
+                    Effect: Allow
+                    Resource:
+                      - !GetAtt ArtifactBucket.Arn
+                      - !Sub ${ArtifactBucket}/*
+                  - Action:
+                      - s3:GetObject
+                      - s3:ListBucket
+                    Effect: Allow
+                    Resource:
+                      - !Sub arn:aws:s3:::${ArtifactBucket}
+                      - !Sub arn:aws:s3:::${ArtifactBucket}/*
+                    Principal:
+                      - !Sub arn:aws:iam::${DevAwsAccountId}:root
+                      - !Sub arn:aws:iam::${ProdAwsAccountId}:root
+    ## End Block 1 ##
+
+    ## Block 2 ##
+
+    PipelineServiceRole:
+        Type: AWS::IAM::Role
+        Properties:
+            Path: /
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                  - Effect: Allow
+                    Principal:
+                        Service:
+                            - codepipeline.amazonaws.com
+                            - codbuild.amazonaws.com
+                    Action: sts:AssumeRole
+            Policies:
+              - Effect: Allow
+                Resource: '*'
+                Action:
+                  # Code* Services
+                  - codecommit:GetBranch
+                  - codecommit:GetCommit
+                  - codecommit:UploadArchive
+                  - codecommit:GetUploadArchiveStatus
+                  - codecommit:CancelUploadArchive
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                  # Encryption/Decryption for artifacts
+                  - kms:Encrypt
+                  - kms:Decrypt
+                  - kms:ReEncrypt*
+                  - kms:GenerateDataKey*
+                  - kms:DescribeKey
+                  # Lambda (Fuzzer) Invokation
+                  - lambda:Invoke*
+                  - Lambda:List*
+                  # Logging
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  # Docker registry (for codebuild)
+                  - ecr:GetAuthorizationToken
+
+    PipelineServiceRoleBucketAccess:
+        DependsOn: ArtifactBucket
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                  - Resource:
+                      - !GetAtt ArtifactBucket.Arn
+                      - !Sub ${ArtifactBucket.Arn}/*
+                    Effect: Allow
+                    Action:
+                      - s3:PutObject
+                      - s3:GetObject
+            PolicyName: PipelineServiceRoleArtifactBucketPolicy
+            Roles:
+              - !Ref PipelineServiceRole
+    ## End Block2 ##

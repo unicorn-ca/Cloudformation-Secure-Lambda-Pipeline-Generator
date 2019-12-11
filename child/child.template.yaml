@@ -20,6 +20,11 @@ Parameters:
     Description: The name of the role to create in the development account. This name must be unique in the development account.
     Default: ChildAccountRole
     Type: String
+  FuzzerSnooperRoleName:
+    Description: The name of the role used to snoop cloudformation outputs
+    Default: unicorn-xaccount-cfm-stack-snooper
+    Type: String
+
 Resources:
   ChildAccountRole:
     Type: AWS::IAM::Role
@@ -58,6 +63,39 @@ Resources:
             - !Sub arn:aws:iam::${AWS::AccountId}:role/SampleLambdaRole-*
             - !Sub arn:aws:iam::${AWS::AccountId}:role/CodePipelineDeploymentRole-*
             - !Sub arn:aws:iam::${AWS::AccountId}:role/CodePipelineServiceRole-*
+  FuzzerSnooper:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref FuzzerSnooperRoleName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Ref CentralAwsAccountId
+          Action: sts:AssumeRole 
+        - Effect: Allow
+          Principal:
+            Service: cloudformation.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: CfnReadOnly
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              # TODO: we almost definately dont need all these
+              - cloudformation:Describe*
+              - cloudformation:EstimateTemplateCost
+              - cloudformation:Get*
+              - cloudformation:List*
+              - cloudformation:ValidateTemplate
+              - cloudformation:Detect*
+            # This is intentional - theres no way of nicely getting the stack before it exists
+            Resource: '*'
+
 Outputs:
   RemoteAccountRole:
     Value: !GetAtt ChildAccountRole.Arn

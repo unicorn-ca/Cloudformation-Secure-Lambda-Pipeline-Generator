@@ -113,6 +113,10 @@ Parameters:
   CCGroupName:
     Description: The name fo the group with permissions to push to Codecommit repositories
     Type: String
+  FuzzerSnooperRoleName:
+    Description: Fuzzer snooper role as described in child deployment
+    Type: String
+    Default: unicorn-xaccount-cfm-stack-snooper
 
 Resources:
   AccountStack:
@@ -200,6 +204,7 @@ Resources:
         StagingBucket: !Ref StagingBucket
         FuzzerDeployKey: !Ref FuzzerDeployKey
         CCGroupName: !Ref CCGroupName
+        FuzzerSnooperRoleName: !Ref FuzzerSnooperRoleName
         AssuranceDeployKey: !Ref AssuranceDeployKey
       TemplateURL: !Sub https://${QSS3BucketName}.s3-${QSS3BucketRegion}.amazonaws.com/${QSS3KeyPrefix}/pipeline.template.yaml
       TimeoutInMinutes: 60

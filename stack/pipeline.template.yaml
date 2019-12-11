@@ -74,6 +74,9 @@ Parameters:
   AssuranceDeployKey:
     Description: Key into the assurance lambda deployment package on the StagingBucket
     Type: String
+  FuzzerSnooperRoleName:
+    Description: Passed in from full-stack
+    Type: String
 
 Conditions:
   IsProdStage: !Equals [ !Ref Branch, 'master' ]
@@ -330,6 +333,21 @@ Resources:
                     Action:
                         - sts:AssumeRole
           Path: /
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sts:AssumeRole
+                Resource:
+                  - !Sub arn:aws:iam::${DevAwsAccountId}:role/${FuzzerSnooperRoleName}
+                  - !Sub arn:aws:iam::${ProdAwsAccountId}:role/${FuzzerSnooperRoleName}
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStack
+                Resource:
+                  - !Sub "arn:aws:cloudformation:*:${DevAwsAccountId}:stack/*/*"
+                  - !Sub "arn:aws:cloudformation:*:${ProdAwsAccountId}:stack/*/*"
 
   FuzzerLambdaExecutionPolicy:
     DependsOn:
